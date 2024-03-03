@@ -1,6 +1,5 @@
-import {Employee, EPreference, EStatus, Task} from "./default_types";
-import {Database} from "../data/database";
-import {ESort, ESortOptions} from "./sorts";
+import {Employee, EPreference, EStatus, Task} from "./basic_types";
+import {ErrorLogger} from "../loggers/error_logger";
 
 export enum EFilterStrategies {
     and = "and"
@@ -19,9 +18,17 @@ export interface IFilterStrategy {
 }
 
 export class ANDFilter {
+    errorLogger: ErrorLogger = ErrorLogger.getErrorLogger()
+
     filtering (type: EFilterStrategies, options: IFilterOptions, tasks: Employee["taskList"]): Task[] {
-        if (type !== EFilterStrategies.and) throw new Error("Incorrect sort strategy")
-        if (!tasks) throw new Error("Empty Task list")
+        if (type !== EFilterStrategies.and) {
+            this.errorLogger.writeErrorLog(new Error("Incorrect sort strategy"))
+            throw new Error("Incorrect sort strategy")
+        }
+        if (!tasks) {
+            this.errorLogger.writeErrorLog(new Error("Empty Task list"))
+            throw new Error("Empty Task list")
+        }
 
         const {preference, status, created, employee} = options
 

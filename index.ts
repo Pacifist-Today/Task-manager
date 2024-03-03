@@ -1,11 +1,13 @@
 import {Database} from "./data/database"
-import {Employee, EOccupation, EPreference, EStatus, Task} from "./modules/default_types"
+import {Employee, EOccupation, EPreference, EStatus, Task} from "./modules/basic_types"
 import {Observable, StatusNotification} from "./modules/notifications";
 import {BubbleSortStrategy, ESort, ESortOptions, ISortStrategy} from "./modules/sorts";
 import {ANDFilter, EFilterStrategies, IFilterOptions, IFilterStrategy} from "./modules/filter"
+import {ErrorLogger} from "./loggers/error_logger";
 
 export class Manager extends Observable {
     private database = Database.getDatabase()
+    private errorLogger = ErrorLogger.getErrorLogger()
     occupation: Employee["occupation"]
     fullName: Employee["fullName"]
     notificationTask!: Task
@@ -21,21 +23,24 @@ export class Manager extends Observable {
 
     public add (task: Task): void {
         if (this.occupation !== EOccupation.admin) {
-            throw new Error("You can't do this without admin's permission")
+            this.errorLogger.writeErrorLog(new Error("You can't add task this without admin permission"))
+            throw new Error("You can't add task this without admin permission")
         }
         this.database.addTask(task)
     }
 
     public edit (task: Task): void {
         if (this.occupation !== EOccupation.admin) {
-            throw new Error("You can't do this without admin's permission")
+            this.errorLogger.writeErrorLog(new Error("You can't edit task without admin permission"))
+            throw new Error("You can't edit task without admin permission")
         }
         this.database.editTask(task)
     }
 
     public remove (id: Task["id"]): void {
         if (this.occupation !== EOccupation.admin) {
-            throw new Error("You can't do this without admin's permission")
+            this.errorLogger.writeErrorLog(new Error("You can't remove task without admin permission"))
+            throw new Error("You can't remove task without admin permission")
         }
         this.database.deleteTask(id)
     }
@@ -50,14 +55,16 @@ export class Manager extends Observable {
 
     public assignEmployee (id: Task["id"], employee: Employee["fullName"] | Employee["fullName"][]): void {
         if (this.occupation !== EOccupation.admin) {
-            throw new Error("You can't do this without admin's permission")
+            this.errorLogger.writeErrorLog(new Error("You can't assign employee without admin permission"))
+            throw new Error("You can't assign employee without admin permission")
         }
         this.database.assignEmployee(id, employee)
     }
 
     public changeTaskStatus (id: Task["id"], status: EStatus) {
         if (this.occupation !== EOccupation.admin) {
-            throw new Error("You can't do this without admin's permission")
+            this.errorLogger.writeErrorLog(new Error("You can't change task status without admin permission"))
+            throw new Error("You can't change task status without admin permission")
         }
         this.database.changeTaskStatus(id, status)
 

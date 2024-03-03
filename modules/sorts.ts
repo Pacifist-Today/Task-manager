@@ -1,4 +1,5 @@
-import {Employee, EPreference, Task} from "./default_types";
+import {Employee, EPreference, Task} from "./basic_types";
+import {ErrorLogger} from "../loggers/error_logger";
 
 export enum ESort {
     bubble = "bubble",
@@ -18,10 +19,18 @@ export interface ISortStrategy {
 }
 
 export class BubbleSortStrategy implements ISortStrategy {
+    errorLogger: ErrorLogger = ErrorLogger.getErrorLogger()
     sorting(sortType: ESort, option: ESortOptions, tasks:Employee["taskList"]): Task[] {
-        if (sortType !== ESort.bubble) throw new Error("Incorrect sort strategy")
+        if (sortType !== ESort.bubble){
+            this.errorLogger.writeErrorLog(new Error("Incorrect sort strategy"))
+            throw new Error("Incorrect sort strategy")
+        }
 
-        if (!tasks) throw new Error("Empty Task list")
+        if (tasks.length === 0) return []
+        // if (!tasks) {
+        //     this.errorLogger.writeErrorLog(new Error(("Empty Task list")))
+        //     throw new Error("Empty Task list")
+        // }
         if (option === ESortOptions.created || option === ESortOptions.deadline) {
             for (let i = 0, endI = tasks.length - 1; i < endI; i++) {
                 let wasSwap = false
@@ -50,13 +59,20 @@ export class BubbleSortStrategy implements ISortStrategy {
         ) {
             return sortPreferenceList(option, tasks)
         }
+        this.errorLogger.writeErrorLog(new Error(("Got incorrect option to sort")))
         throw new Error("Got incorrect option to sort")
     }
 }
 
 export class SelectionSortStrategy implements ISortStrategy {
+    errorLogger: ErrorLogger = ErrorLogger.getErrorLogger()
     sorting(sortType: ESort, option: ESortOptions, tasks:Employee["taskList"]): Task[] {
-        if (sortType !== ESort.selection) throw new Error("Incorrect sort strategy")
+        if (sortType !== ESort.selection) {
+            this.errorLogger.writeErrorLog(new Error("Incorrect sort strategy"))
+            throw new Error("Incorrect sort strategy")
+        }
+
+        if (tasks.length === 0) return []
 
         if (option === ESortOptions.created || option === ESortOptions.deadline) {
             for (let i = 0, l = tasks.length, k = l - 1; i < k; i++) {
@@ -89,6 +105,7 @@ export class SelectionSortStrategy implements ISortStrategy {
         ) {
             return sortPreferenceList(option, tasks)
         }
+        this.errorLogger.writeErrorLog(new Error(("Got incorrect option to sort")))
         throw new Error("Got incorrect option to sort")
     }
 }
